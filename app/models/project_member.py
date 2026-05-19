@@ -21,7 +21,7 @@ class ProjectMember(Base):
         nullable=False
     )
 
-    role: Mapped[str] = mapped_column(
-        String,
+    role_id: Mapped[int] = mapped_column(
+        ForeignKey("roles.id", ondelete="CASCADE"),
         nullable=False
     )
