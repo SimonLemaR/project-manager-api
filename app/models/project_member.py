@@ -1,27 +1,23 @@
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.database import Base
+from app.models.base import AuditMixin, Base, IDMixin
 
 
-class ProjectMember(Base):
-    __tablename__ = "project_members"
-
-    id: Mapped[int] = mapped_column(
-        primary_key=True
-    )
+class ProjectMember(Base, AuditMixin, IDMixin):
+    __tablename__ = "project_member"
 
     project_id: Mapped[int] = mapped_column(
-        ForeignKey("projects.id", ondelete="CASCADE"),
+        ForeignKey("project.id", ondelete="CASCADE"),
         nullable=False
     )
 
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"),
+        ForeignKey("user.id", ondelete="CASCADE"),
         nullable=False
     )
 
     role_id: Mapped[int] = mapped_column(
-        ForeignKey("roles.id", ondelete="CASCADE"),
+        ForeignKey("role.id", ondelete="CASCADE"),
         nullable=False
     )
