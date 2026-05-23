@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.models.user import User
 from app.repositories.user import UserRepository
-from app.schemas.user import UserRegister
-from app.core.security import hash_password
+from app.schemas.user import LoginRequest, TokenResponse, UserRegister
+from app.core.security import create_access_token, hash_password, verify_password
 
 class UserService():
     def __init__(self, db: Session):
@@ -25,5 +25,18 @@ class UserService():
         # crear usuario
         new_user =self.user_repo.create_user(user_data, password_hash)
         return new_user
+    
+    def login_user(self, data: LoginRequest):
+        user = self.user_repo.get_user_by_email(data.email)
+
+        if not user or not verify_password(data.password, user.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password"
+            )
+        access_token = create_access_token(data={"sub": str(user.email), "user_id": str(user.id)})
+        
+        return TokenResponse(access_token=access_token)
+            
     
     
