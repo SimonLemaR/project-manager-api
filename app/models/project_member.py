@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import AuditMixin, Base, IDMixin
@@ -21,3 +21,8 @@ class ProjectMember(Base, AuditMixin, IDMixin):
         ForeignKey("role.id", ondelete="CASCADE"),
         nullable=False
     )
+    
+    UniqueConstraint(
+    "project_id",
+    "user_id"
+)

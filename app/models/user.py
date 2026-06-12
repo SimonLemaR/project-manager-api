@@ -14,6 +14,7 @@ class User(Base, AuditMixin, IDMixin):
         String,
         unique=True,
         nullable=False
+        
     )
 
     password_hash: Mapped[str] = mapped_column(

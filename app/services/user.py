@@ -34,7 +34,7 @@ class UserService():
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid email or password"
             )
-        access_token = create_access_token(data={"sub": str(user.email), "user_id": str(user.id)})
+        access_token = create_access_token(data={"sub": user.email, "user_id": user.id})
         
         return TokenResponse(access_token=access_token)
             

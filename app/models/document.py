@@ -1,15 +1,11 @@
 from sqlalchemy import ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import AuditMixin, Base, IDMixin
 
 
 class Document(Base, AuditMixin, IDMixin):
     __tablename__ = "document"
-
-    id: Mapped[int] = mapped_column(
-        primary_key=True
-    )
 
     project_id: Mapped[int] = mapped_column(
         ForeignKey("project.id", ondelete="CASCADE"),
@@ -29,4 +25,9 @@ class Document(Base, AuditMixin, IDMixin):
     file_type: Mapped[str] = mapped_column(
         String,
         nullable=False
+    )
+
+    project = relationship(
+        "Project",
+        back_populates="documents"
     )

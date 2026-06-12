@@ -9,5 +9,6 @@ class Role(Base, AuditMixin, IDMixin):
 
     name: Mapped[str] = mapped_column(
         String,
-        nullable=False
+        nullable=False,
+        unique=True
     )
