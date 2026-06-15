@@ -13,12 +13,8 @@ class UserService():
     def create_user(self, user_data: UserRegister) -> User:
         # validar usuario existente
         existing_user = self.user_repo.get_user_by_email(user_data.email)
-
         if existing_user:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Email already registered"
-)
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
         
         password_hash = hash_password(user_data.password)
 
@@ -30,10 +26,8 @@ class UserService():
         user = self.user_repo.get_user_by_email(data.email)
 
         if not user or not verify_password(data.password, user.password_hash):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid email or password"
-            )
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
+                                detail="Invalid email or password")
         access_token = create_access_token(data={"sub": user.email, "user_id": user.id})
         
         return TokenResponse(access_token=access_token)

@@ -8,6 +8,9 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.config import SECRET_KEY, ALGORITHM
 from app.repositories.user import UserRepository
+from app.services.project import ProjectService
+from app.services.user import UserService
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/users/login")
 
@@ -30,3 +33,10 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Invalid authentication credentials")
     return user
+
+def get_project_service(db: Session = Depends(get_db)) -> ProjectService:
+    return ProjectService(db)
+
+def get_user_service(db: Session = Depends(get_db)):
+    return UserService(db)
+

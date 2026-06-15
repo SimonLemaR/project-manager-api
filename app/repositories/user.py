@@ -16,11 +16,8 @@ class UserRepository:
         return self.db.query(User).filter(User.id == user_id).first()
 
     def create_user(self, user_data: UserRegister, password_hash: str) -> User:
-        new_user = User(
-            email=user_data.email,
-            full_name=user_data.full_name,
-            password_hash=password_hash
-        )
+        new_user = User(email=user_data.email, full_name=user_data.full_name, 
+                        password_hash=password_hash)
         self.db.add(new_user)
         self.db.commit()
         self.db.refresh(new_user)
