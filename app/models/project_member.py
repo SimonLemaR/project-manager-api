@@ -22,7 +22,5 @@ class ProjectMember(Base, AuditMixin, IDMixin):
         nullable=False
     )
     
-    UniqueConstraint(
-    "project_id",
-    "user_id"
+    __table_args__ = (UniqueConstraint("project_id", "user_id"),
 )

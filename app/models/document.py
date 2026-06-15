@@ -27,7 +27,4 @@ class Document(Base, AuditMixin, IDMixin):
         nullable=False
     )
 
-    project = relationship(
-        "Project",
-        back_populates="documents"
-    )
+    project = relationship("Project",back_populates="documents")

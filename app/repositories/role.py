@@ -6,5 +6,5 @@ class RoleRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_role_by_name(self, role_name: str) -> Role:
+    def get_role_by_name(self, role_name: str) -> Role | None:
         return self.db.query(Role).filter(Role.name == role_name).first()

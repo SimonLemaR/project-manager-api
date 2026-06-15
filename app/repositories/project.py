@@ -8,10 +8,7 @@ class ProjectRepository:
         self.db = db
 
     def create_project(self, name: str, description: str | None) -> Project:
-        new_project = Project(
-            name=name,
-            description=description
-        )
+        new_project = Project(name=name, description=description)
         self.db.add(new_project)
         self.db.flush()
         return new_project

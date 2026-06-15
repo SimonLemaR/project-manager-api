@@ -17,29 +17,19 @@ class ProjectService:
         self.role_repo = RoleRepository(db)
 
     def create_project(self, project_data: ProjectCreate, current_user: User) -> Project:
-
         owner_role = self.role_repo.get_role_by_name("owner")
-
         if not owner_role:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Default role 'owner' not found"
             )
-
         try:
-            project = self.project_repo.create_project(
-                name=project_data.name,
-                description=project_data.description
-            )
-
-            self.project_member_repo.create_project_member(
-                project_id=project.id,
-                user_id=current_user.id,
-                role_id=owner_role.id
-            )
-
+            project = self.project_repo.create_project(name=project_data.name,
+                                                       description=project_data.description)
+            self.project_member_repo.create_project_member(project_id=project.id,
+                                                           user_id=current_user.id,
+                                                           role_id=owner_role.id)
             self.db.commit()
-
             return project
 
         except Exception:
