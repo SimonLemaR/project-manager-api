@@ -18,3 +18,9 @@ class Project(Base, AuditMixin, IDMixin):
     )
 
     documents = relationship("Document", back_populates="project", cascade="all, delete-orphan")
+
+    members = relationship(
+        "ProjectMember",
+        back_populates="project",
+        cascade="all, delete-orphan"
+    )

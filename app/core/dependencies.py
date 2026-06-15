@@ -39,4 +39,3 @@ def get_project_service(db: Session = Depends(get_db)) -> ProjectService:
 
 def get_user_service(db: Session = Depends(get_db)):
     return UserService(db)
-

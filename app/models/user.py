@@ -2,7 +2,7 @@ import uuid
 
 from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import AuditMixin, Base, IDMixin
 
@@ -25,4 +25,9 @@ class User(Base, AuditMixin, IDMixin):
     full_name: Mapped[str] = mapped_column(
         String,
         nullable=False
+    )
+
+    project_members = relationship(
+        "ProjectMember",
+        back_populates="user"
     )

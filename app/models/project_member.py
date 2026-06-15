@@ -1,5 +1,5 @@
 from sqlalchemy import ForeignKey, String, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import AuditMixin, Base, IDMixin
 
@@ -21,6 +21,21 @@ class ProjectMember(Base, AuditMixin, IDMixin):
         ForeignKey("role.id", ondelete="CASCADE"),
         nullable=False
     )
+
+    project = relationship(
+        "Project",
+        back_populates="members"
+    )
+
+    user = relationship(
+        "User",
+        back_populates="project_members"
+    )
+
+    role = relationship(
+        "Role",
+    )
     
     __table_args__ = (UniqueConstraint("project_id", "user_id"),
+                
 )

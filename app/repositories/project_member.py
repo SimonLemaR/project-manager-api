@@ -13,3 +13,5 @@ class ProjectMemberRepository:
         self.db.add(project_member)
 
         return project_member
+    def get_project_members_by_user_id(self, user_id: int) -> list[ProjectMember]:
+        return self.db.query(ProjectMember).filter(ProjectMember.user_id == user_id).all()
