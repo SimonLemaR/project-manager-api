@@ -24,8 +24,7 @@ def upgrade() -> None:
         INSERT INTO role (name)
         VALUES
             ('owner'),
-            ('editor'),
-            ('viewer')
+            ('participant')
         ON CONFLICT (name) DO NOTHING;
         """
     )
