@@ -7,7 +7,7 @@ from app.models.user import User
 from app.repositories.project import ProjectRepository
 from app.repositories.project_member import ProjectMemberRepository
 from app.repositories.role import RoleRepository
-from app.schemas.project import ProjectCreate, ProjectDetailResponse
+from app.schemas.project import ProjectCreate
 from app.schemas.role import RoleResponse
 from app.schemas.user import UserResponse
 
@@ -23,11 +23,6 @@ class ProjectService:
         self, project_data: ProjectCreate, current_user: User
     ) -> Project:
         owner_role = self.role_repo.get_role_by_name("owner")
-        if not owner_role:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Default role 'owner' not found",
-            )
         try:
             project = self.project_repo.create_project(
                 name=project_data.name, description=project_data.description

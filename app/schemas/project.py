@@ -15,8 +15,3 @@ class ProjectResponse(BaseModel):
     description: str
 
     model_config = ConfigDict(from_attributes=True)
-
-class ProjectDetailResponse(ProjectResponse):
-    documents: list[DocumentResponse]
-    user: UserResponse
-    role: RoleResponse
