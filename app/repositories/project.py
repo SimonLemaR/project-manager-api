@@ -34,3 +34,6 @@ class ProjectRepository:
         project.description = description
         self.db.add(project)
         return project
+    
+    def delete_project(self, project: Project) -> None:
+        self.db.delete(project)

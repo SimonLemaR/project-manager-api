@@ -59,3 +59,14 @@ async def update_project(
 ):
     updated_project = project_service.update_project(project_id, project_data, current_user)
     return updated_project
+
+@project_router.delete(
+    "/{project_id}", status_code=status.HTTP_200_OK
+)
+async def delete_project(
+    project_id: int,
+    current_user: User = Depends(get_current_user),
+    project_service: ProjectService = Depends(get_project_service),
+):
+    project_service.delete_project(project_id, current_user)
+    return {"message": "Project deleted successfully"}

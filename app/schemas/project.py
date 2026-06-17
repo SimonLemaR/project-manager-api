@@ -19,3 +19,6 @@ class ProjectResponse(BaseModel):
 class ProjectUpdate(BaseModel):
     name: str
     description: str
+
+class ProjectDeleteResponse(BaseModel):
+    message: str
