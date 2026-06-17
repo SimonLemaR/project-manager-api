@@ -73,14 +73,13 @@ class ProjectService:
         self.db.commit()
         return updated_project
     
-    def delete_project(self, project_id: int, current_user: User) -> None:  
+    def delete_project(self, project_id: int, current_user: User,) -> None:  
         project_member = self.project_member_repo.get_project_member(
-            project_id=project_id, user_id=current_user.id
+            project_id=project_id, user_id=current_user.id, role_name="owner"
         )
         if not project_member:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
             )
-
         self.project_repo.delete_project(project_member.project)
         self.db.commit()

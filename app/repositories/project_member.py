@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.project_member import ProjectMember
 
@@ -23,11 +23,27 @@ class ProjectMemberRepository:
             self.db.query(ProjectMember).filter(ProjectMember.user_id == user_id).all()
         )
 
-    def get_project_member(self, project_id: int, user_id: int) -> ProjectMember | None:
-        return (
+    def get_project_member(
+        self,
+        project_id: int,
+        user_id: int,
+        role_name: str | None = None,
+    ) -> ProjectMember | None:
+
+        query = (
             self.db.query(ProjectMember)
-            .filter(
-                ProjectMember.project_id == project_id, ProjectMember.user_id == user_id
+            .options(
+                joinedload(ProjectMember.project),
+                joinedload(ProjectMember.role),
+                joinedload(ProjectMember.user),
             )
-            .first()
+            .filter(
+                ProjectMember.project_id == project_id,
+                ProjectMember.user_id == user_id,
+            )
         )
+
+        if role_name is not None:
+            query = query.filter(ProjectMember.role.has(name=role_name))
+
+        return query.first()
