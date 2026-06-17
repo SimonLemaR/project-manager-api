@@ -7,7 +7,7 @@ from app.models.user import User
 from app.repositories.project import ProjectRepository
 from app.repositories.project_member import ProjectMemberRepository
 from app.repositories.role import RoleRepository
-from app.schemas.project import ProjectCreate
+from app.schemas.project import ProjectCreate, ProjectUpdate
 from app.schemas.role import RoleResponse
 from app.schemas.user import UserResponse
 
@@ -53,3 +53,22 @@ class ProjectService:
             )
 
         return project_member
+
+    def update_project(
+        self, project_id: int, project_data: ProjectUpdate, current_user: User
+    ) -> Project: 
+        project_member = self.project_member_repo.get_project_member(
+            project_id=project_id, user_id=current_user.id
+        )
+        if not project_member:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+
+        updated_project = self.project_repo.update_project(
+            project=project_member.project,
+            name=project_data.name,
+            description=project_data.description,
+        )
+        self.db.commit()
+        return updated_project

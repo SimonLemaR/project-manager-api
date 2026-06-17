@@ -47,3 +47,15 @@ async def get_project_by_id(
 ):
     project = project_service.get_project_by_id(project_id, current_user)
     return project
+
+@project_router.put(
+    "/{project_id}", response_model=ProjectResponse, status_code=status.HTTP_200_OK
+)
+async def update_project(
+    project_id: int,
+    project_data: ProjectCreate,
+    current_user: User = Depends(get_current_user),
+    project_service: ProjectService = Depends(get_project_service),
+):
+    updated_project = project_service.update_project(project_id, project_data, current_user)
+    return updated_project

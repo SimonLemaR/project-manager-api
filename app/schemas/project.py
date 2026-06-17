@@ -15,3 +15,7 @@ class ProjectResponse(BaseModel):
     description: str
 
     model_config = ConfigDict(from_attributes=True)
+
+class ProjectUpdate(BaseModel):
+    name: str
+    description: str
