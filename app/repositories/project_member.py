@@ -7,11 +7,27 @@ class ProjectMemberRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_project_member(self, project_id: int, user_id: int,role_id: int) -> ProjectMember:
-        project_member = ProjectMember(project_id=project_id, user_id=user_id, role_id=role_id)
+    def create_project_member(
+        self, project_id: int, user_id: int, role_id: int
+    ) -> ProjectMember:
+        project_member = ProjectMember(
+            project_id=project_id, user_id=user_id, role_id=role_id
+        )
 
         self.db.add(project_member)
 
         return project_member
+
     def get_project_members_by_user_id(self, user_id: int) -> list[ProjectMember]:
-        return self.db.query(ProjectMember).filter(ProjectMember.user_id == user_id).all()
+        return (
+            self.db.query(ProjectMember).filter(ProjectMember.user_id == user_id).all()
+        )
+
+    def get_project_member(self, project_id: int, user_id: int) -> ProjectMember | None:
+        return (
+            self.db.query(ProjectMember)
+            .filter(
+                ProjectMember.project_id == project_id, ProjectMember.user_id == user_id
+            )
+            .first()
+        )

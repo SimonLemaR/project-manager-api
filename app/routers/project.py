@@ -12,13 +12,38 @@ from app.core.database import get_db
 
 project_router = APIRouter()
 
-@project_router.post("/", response_model=ProjectResponse, status_code=status.HTTP_201_CREATED)
-async def create_project(project_data: ProjectCreate, current_user: User = Depends(get_current_user),
-                         project_service: ProjectService = Depends(get_project_service)):
+
+@project_router.post(
+    "/", response_model=ProjectResponse, status_code=status.HTTP_201_CREATED
+)
+async def create_project(
+    project_data: ProjectCreate,
+    current_user: User = Depends(get_current_user),
+    project_service: ProjectService = Depends(get_project_service),
+):
     new_project = project_service.create_project(project_data, current_user)
     return new_project
 
-@project_router.get("/", response_model=list[ProjectMemberDetailResponse], status_code=status.HTTP_200_OK)
-async def get_user_projects(current_user: User = Depends(get_current_user),
-                            project_service: ProjectService = Depends(get_project_service)):
+
+@project_router.get(
+    "/",
+    response_model=list[ProjectMemberDetailResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_user_projects(
+    current_user: User = Depends(get_current_user),
+    project_service: ProjectService = Depends(get_project_service),
+):
     return project_service.get_user_projects(current_user)
+
+
+@project_router.get(
+    "/{project_id}", response_model=ProjectMemberDetailResponse, status_code=status.HTTP_200_OK
+)
+async def get_project_by_id(
+    project_id: int,
+    current_user: User = Depends(get_current_user),
+    project_service: ProjectService = Depends(get_project_service),
+):
+    project = project_service.get_project_by_id(project_id, current_user)
+    return project

@@ -38,5 +38,18 @@ class ProjectService:
             raise
 
     def get_user_projects(self, current_user: User) -> list[ProjectMember]:
-        projects_member_data = self.project_member_repo.get_project_members_by_user_id(current_user.id)
+        projects_member_data = self.project_member_repo.get_project_members_by_user_id(
+            current_user.id
+        )
         return projects_member_data
+
+    def get_project_by_id(self, project_id: int, current_user: User) -> Project | None:
+        project_member = self.project_member_repo.get_project_member(
+            project_id=project_id, user_id=current_user.id
+        )
+        if not project_member:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+
+        return project_member

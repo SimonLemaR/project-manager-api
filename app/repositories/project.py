@@ -17,3 +17,6 @@ class ProjectRepository:
     def get_projects_by_user_id(self, user_id: int) -> list[tuple[Project, ProjectMember]]:
         return (self.db.query(Project, ProjectMember).join(ProjectMember, ProjectMember.project_id == Project.id)
             .filter(ProjectMember.user_id == user_id).all())
+    
+    def get_project_by_id(self, project_id: int) -> Project | None:
+        return self.db.query(Project).filter(Project.id == project_id).first()
