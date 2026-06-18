@@ -1,6 +1,7 @@
-from fastapi import HTTPException, status
+from fastapi import HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
+from app.models.document import Document
 from app.models.project import Project
 from app.models.project_member import ProjectMember
 from app.models.user import User
@@ -10,6 +11,8 @@ from app.repositories.role import RoleRepository
 from app.schemas.project import ProjectCreate, ProjectUpdate
 from app.schemas.role import RoleResponse
 from app.schemas.user import UserResponse
+from app.repositories.document import DocumentRepository
+from app.services.project.storage.factory import get_storage_service
 
 
 class ProjectService:
@@ -18,6 +21,8 @@ class ProjectService:
         self.project_repo = ProjectRepository(db)
         self.project_member_repo = ProjectMemberRepository(db)
         self.role_repo = RoleRepository(db)
+        self.document_repo = DocumentRepository(db)
+        self.storage_service = get_storage_service()
 
     def create_project(
         self, project_data: ProjectCreate, current_user: User
@@ -56,7 +61,7 @@ class ProjectService:
 
     def update_project(
         self, project_id: int, project_data: ProjectUpdate, current_user: User
-    ) -> Project: 
+    ) -> Project:
         project_member = self.project_member_repo.get_project_member(
             project_id=project_id, user_id=current_user.id
         )
@@ -72,8 +77,12 @@ class ProjectService:
         )
         self.db.commit()
         return updated_project
-    
-    def delete_project(self, project_id: int, current_user: User,) -> None:  
+
+    def delete_project(
+        self,
+        project_id: int,
+        current_user: User,
+    ) -> None:
         project_member = self.project_member_repo.get_project_member(
             project_id=project_id, user_id=current_user.id, role_name="owner"
         )
@@ -83,3 +92,51 @@ class ProjectService:
             )
         self.project_repo.delete_project(project_member.project)
         self.db.commit()
+
+
+    def upload_documents(
+        self,
+        project_id: int,
+        files: list[UploadFile],
+        current_user: User,
+    ):
+        project_member = self.project_member_repo.get_project_member(
+            project_id=project_id, user_id=current_user.id
+        )
+        if not project_member:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+
+        uploaded_documents = []
+        failed_uploads = []
+
+        for file in files:
+
+            try:
+
+                file_path = self.storage_service.save_file(
+                    project_id=project_id,
+                    file=file,
+                )
+
+                document = self.document_repo.create_document(
+                    project_id=project_id,
+                    file_name=file.filename,
+                    file_path=file_path,
+                    file_type=file.content_type,
+                )
+
+                uploaded_documents.append(document)
+
+            except Exception as e:
+
+                failed_uploads.append(
+                    {
+                        "file_name": file.filename,
+                        "error": str(e),
+                    }
+                )
+
+        self.db.commit()
+        return {"uploaded": uploaded_documents, "failed": failed_uploads}

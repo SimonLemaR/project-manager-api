@@ -1,13 +1,14 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, File, UploadFile, status
 from fastapi import Depends
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user, get_project_service
 from app.models.user import User
+from app.schemas.document import UploadDocumentsResponse
 from app.schemas.project import ProjectCreate, ProjectResponse
 from app.schemas.project_member import ProjectMemberDetailResponse
-from app.services.project import ProjectService
+from app.services.project.project import ProjectService
 from app.core.database import get_db
 
 project_router = APIRouter()
@@ -70,3 +71,19 @@ async def delete_project(
 ):
     project_service.delete_project(project_id, current_user)
     return {"message": "Project deleted successfully"}
+
+@project_router.post(
+    "/{project_id}/documents",
+    response_model=UploadDocumentsResponse,
+)
+async def upload_documents(
+    project_id: int,
+    files: list[UploadFile] = File(...),
+    current_user: User = Depends(get_current_user),
+    project_service: ProjectService = Depends(get_project_service),
+):
+    return project_service.upload_documents(
+        project_id=project_id,
+        files=files,
+        current_user=current_user,
+    )

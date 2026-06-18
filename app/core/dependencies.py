@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.config import SECRET_KEY, ALGORITHM
 from app.repositories.user import UserRepository
-from app.services.project import ProjectService
+from app.services.project.project import ProjectService
 from app.services.user import UserService
 
 
