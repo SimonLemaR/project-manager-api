@@ -24,7 +24,7 @@ class ProjectService:
         project_member_repo: ProjectMemberRepository,
         role_repo: RoleRepository,
         document_repo: DocumentRepository,
-        storage_service: StorageStrategy
+        storage_service: StorageStrategy,
     ):
         self.db = db
         self.project_repo = project_repo
@@ -148,3 +148,22 @@ class ProjectService:
 
         self.db.commit()
         return {"uploaded": uploaded_documents, "failed": failed_uploads}
+
+    def get_project_documents(
+        self,
+        project_id: int,
+        current_user: User,
+    ) -> list[Document]:
+
+        project_member = self.project_member_repo.get_project_member(
+            project_id=project_id,
+            user_id=current_user.id,
+        )
+
+        if not project_member:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Project not found",
+            )
+
+        return self.document_repo.get_documents_by_project_id(project_id)
