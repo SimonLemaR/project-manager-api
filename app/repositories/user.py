@@ -19,6 +19,4 @@ class UserRepository:
         new_user = User(email=user_data.email, full_name=user_data.full_name, 
                         password_hash=password_hash)
         self.db.add(new_user)
-        self.db.commit()
-        self.db.refresh(new_user)
         return new_user

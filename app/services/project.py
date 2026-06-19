@@ -1,6 +1,8 @@
 from fastapi import HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
+from app.core.storage.base import StorageStrategy
+from app.core.storage.local import LocalStorageStrategy
 from app.models.document import Document
 from app.models.project import Project
 from app.models.project_member import ProjectMember
@@ -12,17 +14,24 @@ from app.schemas.project import ProjectCreate, ProjectUpdate
 from app.schemas.role import RoleResponse
 from app.schemas.user import UserResponse
 from app.repositories.document import DocumentRepository
-from app.services.project.storage.factory import get_storage_service
 
 
 class ProjectService:
-    def __init__(self, db: Session):
+    def __init__(
+        self,
+        db: Session,
+        project_repo: ProjectRepository,
+        project_member_repo: ProjectMemberRepository,
+        role_repo: RoleRepository,
+        document_repo: DocumentRepository,
+        storage_service: StorageStrategy
+    ):
         self.db = db
-        self.project_repo = ProjectRepository(db)
-        self.project_member_repo = ProjectMemberRepository(db)
-        self.role_repo = RoleRepository(db)
-        self.document_repo = DocumentRepository(db)
-        self.storage_service = get_storage_service()
+        self.project_repo = project_repo
+        self.project_member_repo = project_member_repo
+        self.role_repo = role_repo
+        self.document_repo = document_repo
+        self.storage_service = storage_service
 
     def create_project(
         self, project_data: ProjectCreate, current_user: User
@@ -92,7 +101,6 @@ class ProjectService:
             )
         self.project_repo.delete_project(project_member.project)
         self.db.commit()
-
 
     def upload_documents(
         self,

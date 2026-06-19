@@ -3,10 +3,10 @@ import shutil
 
 from fastapi import UploadFile
 
-from app.services.project.storage.base import StorageService
+from app.core.storage.base import StorageStrategy
 
 
-class LocalStorageService(StorageService):
+class LocalStorageStrategy(StorageStrategy):
 
     UPLOAD_DIR = Path("/app/uploads")
 

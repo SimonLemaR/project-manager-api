@@ -1,10 +1,11 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 from fastapi import UploadFile
 
-@abstractmethod
-class StorageService:
 
+class StorageStrategy(ABC):
+
+    @abstractmethod
     def save_file(
         self,
         project_id: int,

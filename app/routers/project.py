@@ -8,7 +8,7 @@ from app.models.user import User
 from app.schemas.document import UploadDocumentsResponse
 from app.schemas.project import ProjectCreate, ProjectResponse
 from app.schemas.project_member import ProjectMemberDetailResponse
-from app.services.project.project import ProjectService
+from app.services.project import ProjectService
 from app.core.database import get_db
 
 project_router = APIRouter()

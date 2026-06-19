@@ -7,8 +7,9 @@ from app.schemas.user import LoginRequest, TokenResponse, UserRegister
 from app.core.security import create_access_token, hash_password, verify_password
 
 class UserService():
-    def __init__(self, db: Session):
-        self.user_repo = UserRepository(db)
+    def __init__(self, db: Session, user_repo: UserRepository):
+        self.user_repo = user_repo
+        self.db = db
 
     def create_user(self, user_data: UserRegister) -> User:
         # validar usuario existente
@@ -20,6 +21,7 @@ class UserService():
 
         # crear usuario
         new_user =self.user_repo.create_user(user_data, password_hash)
+        self.db.commit()
         return new_user
     
     def login_user(self, data: LoginRequest):
