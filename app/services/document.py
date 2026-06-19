@@ -1,5 +1,9 @@
-from fastapi import HTTPException, status
+from pathlib import Path
 
+from fastapi import HTTPException, UploadFile, status
+from sqlalchemy.orm import Session
+
+from app.core.storage.local import LocalStorageStrategy
 from app.models.document import Document
 from app.models.user import User
 from app.repositories.document import DocumentRepository
@@ -11,18 +15,21 @@ class DocumentService:
         self,
         document_repo: DocumentRepository,
         project_member_repo: ProjectMemberRepository,
+        storage_service: LocalStorageStrategy,
+        db: Session,
     ):
         self.document_repo = document_repo
-        self.project_member_repo = project_member_repo  
-          
-    def get_document_for_download(
+        self.project_member_repo = project_member_repo
+        self.storage_service = storage_service
+        self.db = db
+
+    def get_document_by_id(
         self,
         document_id: int,
         current_user: User,
     ) -> Document:
-        
-        document = self.document_repo.get_document_by_id(document_id)
 
+        document = self.document_repo.get_document_by_id(document_id)
 
         if not document:
             raise HTTPException(
@@ -41,4 +48,24 @@ class DocumentService:
                 detail="document not found",
             )
 
+        return document
+
+    def update_document(
+        self,
+        document_id: int,
+        file: UploadFile,
+        current_user: User,
+    ) -> Document:
+        document = self.get_document_by_id(document_id, current_user)
+        old_file_path = document.file_path
+        new_file_path = self.storage_service.save_file(
+            project_id=document.project_id,
+            file=file,
+        )
+        document.file_name = file.filename
+        document.file_path = new_file_path
+        document.file_type = file.content_type
+        self.db.commit()
+        self.db.refresh(document)
+        Path(old_file_path).unlink(missing_ok=True)
         return document

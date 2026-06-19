@@ -47,3 +47,9 @@ class LocalStorageStrategy(StorageStrategy):
             )
 
         return str(file_path)
+    
+    def delete_file(
+        self,
+        file_path: str,
+    ) -> None:
+        Path(file_path).unlink(missing_ok=True)

@@ -73,4 +73,5 @@ def get_user_service(db: Session = Depends(get_db)):
 def get_document_service(db: Session = Depends(get_db)):
     document_repo = DocumentRepository(db)
     project_member_repo = ProjectMemberRepository(db)
-    return DocumentService(document_repo, project_member_repo)
+    storage_strategy = LocalStorageStrategy()
+    return DocumentService(document_repo, project_member_repo, storage_strategy, db)
