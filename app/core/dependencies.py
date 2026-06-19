@@ -13,6 +13,7 @@ from app.repositories.project import ProjectRepository
 from app.repositories.project_member import ProjectMemberRepository
 from app.repositories.role import RoleRepository
 from app.repositories.user import UserRepository
+from app.services.document import DocumentService
 from app.services.project import ProjectService
 from app.services.user import UserService
 
@@ -68,3 +69,8 @@ def get_project_service(db: Session = Depends(get_db)) -> ProjectService:
 def get_user_service(db: Session = Depends(get_db)):
     user_repo = UserRepository(db)
     return UserService(db, user_repo)
+
+def get_document_service(db: Session = Depends(get_db)):
+    document_repo = DocumentRepository(db)
+    project_member_repo = ProjectMemberRepository(db)
+    return DocumentService(document_repo, project_member_repo)

@@ -33,3 +33,8 @@ class DocumentRepository:
     ) -> list[Document]:
         return self.db.query(Document).filter(Document.project_id == project_id).all()
 
+    def get_document_by_id(
+        self,
+        document_id: int,
+    ) -> Document | None:
+        return self.db.query(Document).filter(Document.id == document_id).first()
