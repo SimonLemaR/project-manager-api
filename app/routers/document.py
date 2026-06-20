@@ -44,3 +44,17 @@ async def update_document(
         file=file,
         current_user=current_user,
     )
+
+@document_router.delete(
+    "/{document_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_document(
+    document_id: int,
+    current_user: User = Depends(get_current_user),
+    document_service: DocumentService = Depends(get_document_service),
+):
+    document_service.delete_document(
+        document_id=document_id,
+        current_user=current_user,
+    )

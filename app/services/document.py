@@ -8,6 +8,7 @@ from app.models.document import Document
 from app.models.user import User
 from app.repositories.document import DocumentRepository
 from app.repositories.project_member import ProjectMemberRepository
+from app.repositories.role import RoleRepository
 
 
 class DocumentService:
@@ -69,3 +70,13 @@ class DocumentService:
         self.db.refresh(document)
         Path(old_file_path).unlink(missing_ok=True)
         return document
+
+    def delete_document(
+        self,
+        document_id: int,
+        current_user: User,
+    ) -> None:
+        document = self.get_document_by_id(document_id, current_user)
+        self.document_repo.delete_document(document)
+        self.db.commit()
+        self.storage_service.delete_file(document.file_path)
