@@ -3,7 +3,7 @@ from fastapi.responses import FileResponse
 
 from app.core.dependencies import get_current_user, get_document_service, get_project_service
 from app.models.user import User
-from app.schemas.document import DocumentResponse
+from app.schemas.document import DocumentDeleteResponse, DocumentResponse
 from app.services.document import DocumentService
 
 document_router = APIRouter()
@@ -47,7 +47,8 @@ async def update_document(
 
 @document_router.delete(
     "/{document_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=DocumentDeleteResponse,
+    status_code=status.HTTP_200_OK,
 )
 async def delete_document(
     document_id: int,
@@ -58,3 +59,6 @@ async def delete_document(
         document_id=document_id,
         current_user=current_user,
     )
+    return {
+        "message": "Document deleted succesfully"
+    }
