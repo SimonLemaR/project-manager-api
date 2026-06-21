@@ -16,10 +16,7 @@ class LocalStorageStrategy(StorageStrategy):
         file: UploadFile,
     ) -> str:
 
-        project_folder = (
-            self.UPLOAD_DIR
-            / f"{project_id}_project"
-        )
+        project_folder = self.UPLOAD_DIR / f"{project_id}_project"
 
         project_folder.mkdir(
             parents=True,
@@ -33,21 +30,15 @@ class LocalStorageStrategy(StorageStrategy):
             original_name = file_path.stem
             extension = file_path.suffix
 
-            file_path = (
-                project_folder
-                / f"{original_name}_{counter}{extension}"
-            )
+            file_path = project_folder / f"{original_name}_{counter}{extension}"
 
             counter += 1
 
         with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(
-                file.file,
-                buffer
-            )
+            shutil.copyfileobj(file.file, buffer)
 
         return str(file_path)
-    
+
     def delete_file(
         self,
         file_path: str,

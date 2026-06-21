@@ -4,11 +4,12 @@ from fastapi import HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_current_user, get_project_service
+from app.core.dependencies import get_current_user, get_document_service, get_project_service
 from app.models.user import User
 from app.schemas.document import DocumentResponse, UploadDocumentsResponse
 from app.schemas.project import ProjectCreate, ProjectResponse
 from app.schemas.project_member import ProjectMemberDetailResponse
+from app.services.document import DocumentService
 from app.services.project import ProjectService
 from app.core.database import get_db
 
@@ -86,9 +87,9 @@ async def upload_documents(
     project_id: int,
     files: list[UploadFile] = File(...),
     current_user: User = Depends(get_current_user),
-    project_service: ProjectService = Depends(get_project_service),
+    document_service: DocumentService = Depends(get_document_service),
 ):
-    return project_service.upload_documents(
+    return document_service.upload_documents(
         project_id=project_id,
         files=files,
         current_user=current_user,
