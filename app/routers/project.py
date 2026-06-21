@@ -108,3 +108,19 @@ async def get_project_documents(
         project_id=project_id,
         current_user=current_user,
     )
+
+@project_router.post(
+    "/{project_id}/invite",
+    response_model=ProjectMemberDetailResponse,
+)
+async def invite_user(
+    project_id: int,
+    user: str,
+    current_user: User = Depends(get_current_user),
+    project_service: ProjectService = Depends(get_project_service),
+):
+    return project_service.invite_user(
+        project_id=project_id,
+        user=user,
+        current_user=current_user,
+    )

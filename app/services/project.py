@@ -10,6 +10,7 @@ from app.models.user import User
 from app.repositories.project import ProjectRepository
 from app.repositories.project_member import ProjectMemberRepository
 from app.repositories.role import RoleRepository
+from app.repositories.user import UserRepository
 from app.schemas.project import ProjectCreate, ProjectUpdate
 from app.schemas.role import RoleResponse
 from app.schemas.user import UserResponse
@@ -25,6 +26,7 @@ class ProjectService:
         role_repo: RoleRepository,
         document_repo: DocumentRepository,
         storage_service: StorageStrategy,
+        user_repo: UserRepository,
     ):
         self.db = db
         self.project_repo = project_repo
@@ -32,6 +34,7 @@ class ProjectService:
         self.role_repo = role_repo
         self.document_repo = document_repo
         self.storage_service = storage_service
+        self.user_repo = user_repo
 
     def create_project(
         self, project_data: ProjectCreate, current_user: User
@@ -167,3 +170,49 @@ class ProjectService:
             )
 
         return self.document_repo.get_documents_by_project_id(project_id)
+
+    def invite_user(
+        self, project_id: int, user: str, current_user: User
+    ) -> ProjectMember:
+
+        owner_member = self.project_member_repo.get_project_member(
+            project_id=project_id,
+            user_id=current_user.id,
+            role_name="owner",
+        )
+        if not owner_member:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Project not found",
+            )
+        invited_user = self.user_repo.get_user_by_email(user)
+
+        if not invited_user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found",
+            )
+        
+        existing_user_member = self.project_member_repo.get_project_member(
+            project_id=project_id,
+            user_id=invited_user.id,
+        )
+
+        if existing_user_member:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User is already a member of the project",
+            )
+        
+        participant_role = self.role_repo.get_role_by_name("participant")
+
+        project_member = self.project_member_repo.create_project_member(
+            project_id=project_id,
+            user_id=invited_user.id,
+            role_id=participant_role.id,
+    )
+
+        self.db.commit()
+        self.db.refresh(project_member)
+
+        return project_member

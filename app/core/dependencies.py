@@ -54,6 +54,7 @@ def get_project_service(db: Session = Depends(get_db)) -> ProjectService:
     project_member_repo = ProjectMemberRepository(db)
     role_repo = RoleRepository(db)
     document_repo = DocumentRepository(db)
+    user_repo = UserRepository(db)
     if settings.STORAGE_PROVIDER == "local":
         storage_strategy = LocalStorageStrategy()
     return ProjectService(
@@ -63,6 +64,7 @@ def get_project_service(db: Session = Depends(get_db)) -> ProjectService:
         role_repo,
         document_repo,
         storage_strategy,
+        user_repo,
     )
 
 
