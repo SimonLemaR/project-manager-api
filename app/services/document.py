@@ -3,7 +3,7 @@ from pathlib import Path
 from fastapi import HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
-from app.core.storage.local import LocalStorageStrategy
+from app.core.storage.base import StorageStrategy
 from app.models.document import Document
 from app.models.user import User
 from app.repositories.document import DocumentRepository
@@ -23,7 +23,7 @@ class DocumentService:
         self,
         document_repo: DocumentRepository,
         project_member_repo: ProjectMemberRepository,
-        storage_service: LocalStorageStrategy,
+        storage_service: StorageStrategy,
         db: Session,
     ):
         self.document_repo = document_repo
@@ -125,7 +125,7 @@ class DocumentService:
         document.file_type = file.content_type
         self.db.commit()
         self.db.refresh(document)
-        Path(old_file_path).unlink(missing_ok=True)
+        self.storage_service.delete_file(old_file_path)
         return document
 
     def delete_document(

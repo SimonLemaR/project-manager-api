@@ -15,8 +15,6 @@ from app.schemas.project import ProjectCreate, ProjectUpdate
 from app.schemas.role import RoleResponse
 from app.schemas.user import UserResponse
 from app.repositories.document import DocumentRepository
-from app.services.document import _validate_file
-
 
 class ProjectService:
     def __init__(

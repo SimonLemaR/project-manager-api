@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.config import settings
+from app.core.storage.s3 import S3StorageStrategy
 from app.core.storage.local import LocalStorageStrategy
 from app.repositories.document import DocumentRepository
 from app.repositories.project import ProjectRepository
@@ -55,8 +56,7 @@ def get_project_service(db: Session = Depends(get_db)) -> ProjectService:
     role_repo = RoleRepository(db)
     document_repo = DocumentRepository(db)
     user_repo = UserRepository(db)
-    if settings.STORAGE_PROVIDER == "local":
-        storage_strategy = LocalStorageStrategy()
+    storage_strategy = get_storage_service()
     return ProjectService(
         db,
         project_repo,
@@ -75,5 +75,14 @@ def get_user_service(db: Session = Depends(get_db)):
 def get_document_service(db: Session = Depends(get_db)):
     document_repo = DocumentRepository(db)
     project_member_repo = ProjectMemberRepository(db)
-    storage_strategy = LocalStorageStrategy()
+    storage_strategy = get_storage_service()
     return DocumentService(document_repo, project_member_repo, storage_strategy, db)
+
+def get_storage_service() -> LocalStorageStrategy | S3StorageStrategy:
+    if settings.STORAGE_PROVIDER == "local":
+        return LocalStorageStrategy()
+    elif settings.STORAGE_PROVIDER == "s3":
+        return S3StorageStrategy()
+    raise ValueError(
+        f"Invalid storage provider: {settings.STORAGE_PROVIDER}"
+    )

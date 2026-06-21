@@ -11,4 +11,4 @@ class StorageStrategy(ABC):
 
     @abstractmethod
     def delete_file(self,file_path: str,) -> None:
-        pass
+        raise NotImplementedError
