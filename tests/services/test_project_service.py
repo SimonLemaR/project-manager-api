@@ -1,5 +1,6 @@
 from unittest.mock import Mock
 
+from fastapi import HTTPException
 import pytest
 
 from app.schemas.project import ProjectCreate
@@ -108,4 +109,56 @@ def test_get_user_projects_success():
 
     builder.project_member_repo.get_project_members_by_user_id.assert_called_once_with(
         user.id
+    )
+
+
+def test_get_project_by_id_success():
+    # Arrange
+    builder = ProjectServiceTestBuilder()
+
+    user = builder.create_user()
+
+    project = builder.create_project()
+
+    project_member = Mock()
+    project_member.project = project
+
+    builder.project_member_repo.get_project_member.return_value = project_member
+
+    # Act
+    result = builder.service.get_project_by_id(
+        project_id=project.id,
+        current_user=user,
+    )
+
+    # Assert
+    assert result == project_member
+
+    builder.project_member_repo.get_project_member.assert_called_once_with(
+        project_id=project.id,
+        user_id=user.id,
+    )
+
+
+def test_get_project_by_id_not_found():
+    # Arrange
+    builder = ProjectServiceTestBuilder()
+
+    user = builder.create_user()
+
+    builder.project_member_repo.get_project_member.return_value = None
+
+    # Act
+    with pytest.raises(HTTPException) as exc_info:
+        builder.service.get_project_by_id(
+            project_id=1,
+            current_user=user,
+        )
+    # Assert
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.detail == "Project not found"
+
+    builder.project_member_repo.get_project_member.assert_called_once_with(
+        project_id=1,
+        user_id=user.id,
     )
