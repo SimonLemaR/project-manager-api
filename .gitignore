@@ -34,3 +34,6 @@ htmlcov/
 
 # Docker
 *.log
+
+# Uploaded documents
+uploads/

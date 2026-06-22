@@ -6,13 +6,8 @@ from sqlalchemy import pool
 from alembic import context
 
 from app.core.config import DATABASE_URL
-from app.core.database import Base
+from app.models.base import Base
 
-from app.models.user import User
-from app.models.project import Project
-from app.models.project_member import ProjectMember
-from app.models.document import Document
-from app.models.role import Role
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -74,9 +69,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
