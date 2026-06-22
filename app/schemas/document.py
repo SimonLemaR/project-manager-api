@@ -19,5 +19,6 @@ class UploadDocumentsResponse(BaseModel):
     uploaded: list[DocumentResponse]
     failed: list[FailedUploadResponse]
 
+
 class DocumentDeleteResponse(BaseModel):
-    message : str
+    message: str

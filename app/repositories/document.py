@@ -4,7 +4,6 @@ from app.models.document import Document
 
 
 class DocumentRepository:
-
     def __init__(self, db: Session):
         self.db = db
 
@@ -15,7 +14,6 @@ class DocumentRepository:
         file_path: str,
         file_type: str,
     ) -> Document:
-
         document = Document(
             project_id=project_id,
             file_name=file_name,
@@ -27,10 +25,16 @@ class DocumentRepository:
 
         return document
 
-    def get_documents_by_project_id(self,project_id: int,) -> list[Document]:
+    def get_documents_by_project_id(
+        self,
+        project_id: int,
+    ) -> list[Document]:
         return self.db.query(Document).filter(Document.project_id == project_id).all()
 
-    def get_document_by_id(self,document_id: int,) -> Document | None:
+    def get_document_by_id(
+        self,
+        document_id: int,
+    ) -> Document | None:
         return self.db.query(Document).filter(Document.id == document_id).first()
 
     def delete_document(self, document: Document) -> None:

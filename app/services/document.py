@@ -8,12 +8,13 @@ from app.models.document import Document
 from app.models.user import User
 from app.repositories.document import DocumentRepository
 from app.repositories.project_member import ProjectMemberRepository
-from app.repositories.role import RoleRepository
 
 
 class DocumentService:
-
-    ALLOWED_EXTENSIONS = {".pdf",".docx",}
+    ALLOWED_EXTENSIONS = {
+        ".pdf",
+        ".docx",
+    }
     ALLOWED_CONTENT_TYPES = {
         "application/pdf",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -49,11 +50,9 @@ class DocumentService:
         failed_uploads = []
 
         for file in files:
-
             self._validate_file(file)
 
             try:
-
                 file_path = self.storage_service.save_file(
                     project_id=project_id,
                     file=file,
@@ -69,7 +68,6 @@ class DocumentService:
                 uploaded_documents.append(document)
 
             except Exception as e:
-
                 failed_uploads.append(
                     {
                         "file_name": file.filename,
@@ -79,13 +77,12 @@ class DocumentService:
 
         self.db.commit()
         return {"uploaded": uploaded_documents, "failed": failed_uploads}
-        
+
     def get_document_by_id(
         self,
         document_id: int,
         current_user: User,
     ) -> Document:
-
         document = self.document_repo.get_document_by_id(document_id)
 
         if not document:
@@ -153,4 +150,4 @@ class DocumentService:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Only PDF and DOCX files are allowed",
-            ) 
+            )

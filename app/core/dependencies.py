@@ -72,17 +72,17 @@ def get_user_service(db: Session = Depends(get_db)):
     user_repo = UserRepository(db)
     return UserService(db, user_repo)
 
+
 def get_document_service(db: Session = Depends(get_db)):
     document_repo = DocumentRepository(db)
     project_member_repo = ProjectMemberRepository(db)
     storage_strategy = get_storage_service()
     return DocumentService(document_repo, project_member_repo, storage_strategy, db)
 
+
 def get_storage_service() -> LocalStorageStrategy | S3StorageStrategy:
     if settings.STORAGE_PROVIDER == "local":
         return LocalStorageStrategy()
     elif settings.STORAGE_PROVIDER == "s3":
         return S3StorageStrategy()
-    raise ValueError(
-        f"Invalid storage provider: {settings.STORAGE_PROVIDER}"
-    )
+    raise ValueError(f"Invalid storage provider: {settings.STORAGE_PROVIDER}")

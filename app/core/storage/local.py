@@ -7,7 +7,6 @@ from app.core.storage.base import StorageStrategy
 
 
 class LocalStorageStrategy(StorageStrategy):
-
     UPLOAD_DIR = Path("/app/uploads")
 
     def save_file(
@@ -15,7 +14,6 @@ class LocalStorageStrategy(StorageStrategy):
         project_id: int,
         file: UploadFile,
     ) -> str:
-
         project_folder = self.UPLOAD_DIR / f"{project_id}_project"
 
         project_folder.mkdir(
@@ -26,7 +24,6 @@ class LocalStorageStrategy(StorageStrategy):
         file_path = project_folder / file.filename
         counter = 1
         while file_path.exists():
-
             original_name = file_path.stem
             extension = file_path.suffix
 

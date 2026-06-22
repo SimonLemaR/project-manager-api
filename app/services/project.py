@@ -1,8 +1,7 @@
-from fastapi import HTTPException, UploadFile, status
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.storage.base import StorageStrategy
-from app.core.storage.local import LocalStorageStrategy
 from app.models.document import Document
 from app.models.project import Project
 from app.models.project_member import ProjectMember
@@ -12,9 +11,8 @@ from app.repositories.project_member import ProjectMemberRepository
 from app.repositories.role import RoleRepository
 from app.repositories.user import UserRepository
 from app.schemas.project import ProjectCreate, ProjectUpdate
-from app.schemas.role import RoleResponse
-from app.schemas.user import UserResponse
 from app.repositories.document import DocumentRepository
+
 
 class ProjectService:
     def __init__(
@@ -109,7 +107,6 @@ class ProjectService:
         project_id: int,
         current_user: User,
     ) -> list[Document]:
-
         project_member = self.project_member_repo.get_project_member(
             project_id=project_id,
             user_id=current_user.id,
@@ -126,7 +123,6 @@ class ProjectService:
     def invite_user(
         self, project_id: int, user: str, current_user: User
     ) -> ProjectMember:
-
         owner_member = self.project_member_repo.get_project_member(
             project_id=project_id,
             user_id=current_user.id,
@@ -144,7 +140,7 @@ class ProjectService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="User not found",
             )
-        
+
         existing_user_member = self.project_member_repo.get_project_member(
             project_id=project_id,
             user_id=invited_user.id,
@@ -155,14 +151,14 @@ class ProjectService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="User is already a member of the project",
             )
-        
+
         participant_role = self.role_repo.get_role_by_name("participant")
 
         project_member = self.project_member_repo.create_project_member(
             project_id=project_id,
             user_id=invited_user.id,
             role_id=participant_role.id,
-    )
+        )
 
         self.db.commit()
         self.db.refresh(project_member)

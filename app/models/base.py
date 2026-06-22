@@ -1,9 +1,11 @@
-from datetime import datetime, UTC
+from datetime import datetime
 from sqlalchemy import DateTime, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
+
 class Base(DeclarativeBase):
     pass
+
 
 class AuditMixin:
     created_at: Mapped[datetime] = mapped_column(
@@ -18,6 +20,7 @@ class AuditMixin:
         onupdate=func.now(),
         nullable=False,
     )
+
 
 class IDMixin:
     id: Mapped[int] = mapped_column(primary_key=True)

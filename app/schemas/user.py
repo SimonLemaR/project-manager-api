@@ -13,7 +13,8 @@ class UserRegister(BaseModel):
             raise ValueError("Passwords do not match")
 
         return self
-    
+
+
 class UserResponse(BaseModel):
     id: int
     email: str
@@ -21,9 +22,11 @@ class UserResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
+
 
 class TokenResponse(BaseModel):
     access_token: str

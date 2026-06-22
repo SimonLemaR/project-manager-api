@@ -5,15 +5,15 @@ Revises: 14a7244eef7f
 Create Date: 2026-06-12 04:40:06.264812
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'ebf1b81e9044'
-down_revision: Union[str, Sequence[str], None] = '14a7244eef7f'
+revision: str = "ebf1b81e9044"
+down_revision: Union[str, Sequence[str], None] = "14a7244eef7f"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -31,6 +31,4 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    raise NotImplementedError(
-        "Default system roles should not be removed."
-    )
+    raise NotImplementedError("Default system roles should not be removed.")

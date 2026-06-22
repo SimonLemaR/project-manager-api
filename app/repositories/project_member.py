@@ -29,7 +29,6 @@ class ProjectMemberRepository:
         user_id: int,
         role_name: str | None = None,
     ) -> ProjectMember | None:
-
         query = (
             self.db.query(ProjectMember)
             .options(

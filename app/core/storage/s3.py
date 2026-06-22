@@ -6,7 +6,6 @@ from app.core.storage.base import StorageStrategy
 
 
 class S3StorageStrategy(StorageStrategy):
-
     def __init__(self):
         self.bucket_name = settings.AWS_BUCKET_NAME
         self.client = boto3.client(
@@ -29,7 +28,6 @@ class S3StorageStrategy(StorageStrategy):
         self,
         file_path: str,
     ) -> None:
-
         self.client.delete_object(
             Bucket=self.bucket_name,
             Key=file_path,

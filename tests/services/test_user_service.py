@@ -1,4 +1,4 @@
-from unittest.mock import Mock, create_autospec, patch
+from unittest.mock import Mock, patch
 
 from fastapi import HTTPException
 import pytest
@@ -36,13 +36,12 @@ def test_create_user_success():
     # Assert
     assert result == created_user
 
-    user_repo.get_user_by_email.assert_called_once_with(
-        user_data.email
-    )
+    user_repo.get_user_by_email.assert_called_once_with(user_data.email)
 
     user_repo.create_user.assert_called_once()
 
     db.commit.assert_called_once()
+
 
 def test_create_user_user_already_exists():
     # Arrange
@@ -70,13 +69,12 @@ def test_create_user_user_already_exists():
     # Assert
     assert exc_info.value.status_code == 409
 
-    assert (
-        exc_info.value.detail == "Email already registered"
-    )
+    assert exc_info.value.detail == "Email already registered"
 
     user_repo.create_user.assert_not_called()
 
     db.commit.assert_not_called()
+
 
 def test_login_user_success():
     db = Mock()
@@ -86,7 +84,7 @@ def test_login_user_success():
         email="test@test.com",
         password="Password123",
     )
-    
+
     user = Mock()
     user.id = 1
     user.email = "test@test.com"
@@ -112,9 +110,7 @@ def test_login_user_success():
     # Assert
     assert result.access_token == "fake_jwt"
 
-    user_repo.get_user_by_email.assert_called_once_with(
-        login_data.email
-    )
+    user_repo.get_user_by_email.assert_called_once_with(login_data.email)
 
     mock_verify_password.assert_called_once_with(
         login_data.password,
@@ -128,6 +124,7 @@ def test_login_user_success():
         }
     )
 
+
 def test_login_user_wrong_password():
     db = Mock()
     user_repo = Mock(spec=UserRepository)
@@ -136,7 +133,7 @@ def test_login_user_wrong_password():
         email="test@test.com",
         password="Password123",
     )
-    
+
     user = Mock()
     user.id = 1
     user.email = "test@test.com"
@@ -163,8 +160,6 @@ def test_login_user_wrong_password():
     # Assert
     assert exc_info.value.status_code == 401
 
-    assert (
-        exc_info.value.detail == "Invalid email or password"
-    )
+    assert exc_info.value.detail == "Invalid email or password"
 
     mock_create_access_token.assert_not_called()
