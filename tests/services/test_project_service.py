@@ -85,3 +85,27 @@ def test_create_project_rollback_on_exception():
     db.rollback.assert_called_once()
 
     db.commit.assert_not_called()
+
+
+def test_get_user_projects_success():
+    # Arrange
+    builder = ProjectServiceTestBuilder()
+
+    user = builder.create_user()
+
+    projects = [
+        Mock(),
+        Mock(),
+    ]
+
+    builder.project_member_repo.get_project_members_by_user_id.return_value = projects
+
+    # Act
+    result = builder.service.get_user_projects(user)
+
+    # Assert
+    assert result == projects
+
+    builder.project_member_repo.get_project_members_by_user_id.assert_called_once_with(
+        user.id
+    )
