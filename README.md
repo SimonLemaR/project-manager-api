@@ -53,6 +53,10 @@ Each layer has a single responsibility:
 
 ---
 
+# Entity Relationship Diagram
+
+![Entity Relationship Diagram](docs/ER_Diagram.png)
+
 # Design Principles
 
 This project applies several software engineering principles and design patterns:
