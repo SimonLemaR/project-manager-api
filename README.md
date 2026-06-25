@@ -93,13 +93,13 @@ This project applies several software engineering principles and design patterns
 ```
 app/
 ├── core/
-├── database/
+    ├── database/
+    └── storage/
 ├── models/
 ├── repositories/
 ├── routers/
 ├── schemas/
 ├── services/
-├── storage/
 └── main.py
 
 tests/
