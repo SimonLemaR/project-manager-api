@@ -1,0 +1,166 @@
+from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.core.storage.base import StorageStrategy
+from app.models.document import Document
+from app.models.project import Project
+from app.models.project_member import ProjectMember
+from app.models.user import User
+from app.repositories.project import ProjectRepository
+from app.repositories.project_member import ProjectMemberRepository
+from app.repositories.role import RoleRepository
+from app.repositories.user import UserRepository
+from app.schemas.project import ProjectCreate, ProjectUpdate
+from app.repositories.document import DocumentRepository
+
+
+class ProjectService:
+    def __init__(
+        self,
+        db: Session,
+        project_repo: ProjectRepository,
+        project_member_repo: ProjectMemberRepository,
+        role_repo: RoleRepository,
+        document_repo: DocumentRepository,
+        storage_service: StorageStrategy,
+        user_repo: UserRepository,
+    ):
+        self.db = db
+        self.project_repo = project_repo
+        self.project_member_repo = project_member_repo
+        self.role_repo = role_repo
+        self.document_repo = document_repo
+        self.storage_service = storage_service
+        self.user_repo = user_repo
+
+    def create_project(
+        self, project_data: ProjectCreate, current_user: User
+    ) -> Project:
+        owner_role = self.role_repo.get_role_by_name("owner")
+        try:
+            project = self.project_repo.create_project(
+                name=project_data.name, description=project_data.description
+            )
+            self.project_member_repo.create_project_member(
+                project_id=project.id, user_id=current_user.id, role_id=owner_role.id
+            )
+            self.db.commit()
+            return project
+
+        except Exception:
+            self.db.rollback()
+            raise
+
+    def get_user_projects(self, current_user: User) -> list[ProjectMember]:
+        projects_member_data = self.project_member_repo.get_project_members_by_user_id(
+            current_user.id
+        )
+        return projects_member_data
+
+    def get_project_by_id(self, project_id: int, current_user: User) -> Project | None:
+        project_member = self.project_member_repo.get_project_member(
+            project_id=project_id, user_id=current_user.id
+        )
+        if not project_member:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+
+        return project_member
+
+    def update_project(
+        self, project_id: int, project_data: ProjectUpdate, current_user: User
+    ) -> Project:
+        project_member = self.project_member_repo.get_project_member(
+            project_id=project_id, user_id=current_user.id
+        )
+        if not project_member:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+
+        updated_project = self.project_repo.update_project(
+            project=project_member.project,
+            name=project_data.name,
+            description=project_data.description,
+        )
+        self.db.commit()
+        return updated_project
+
+    def delete_project(
+        self,
+        project_id: int,
+        current_user: User,
+    ) -> None:
+        project_member = self.project_member_repo.get_project_member(
+            project_id=project_id, user_id=current_user.id, role_name="owner"
+        )
+        if not project_member:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+        self.project_repo.delete_project(project_member.project)
+        self.db.commit()
+
+    def get_project_documents(
+        self,
+        project_id: int,
+        current_user: User,
+    ) -> list[Document]:
+        project_member = self.project_member_repo.get_project_member(
+            project_id=project_id,
+            user_id=current_user.id,
+        )
+
+        if not project_member:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Project not found",
+            )
+
+        return self.document_repo.get_documents_by_project_id(project_id)
+
+    def invite_user(
+        self, project_id: int, user: str, current_user: User
+    ) -> ProjectMember:
+        owner_member = self.project_member_repo.get_project_member(
+            project_id=project_id,
+            user_id=current_user.id,
+            role_name="owner",
+        )
+        if not owner_member:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Project not found",
+            )
+        invited_user = self.user_repo.get_user_by_email(user)
+
+        if not invited_user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found",
+            )
+
+        existing_user_member = self.project_member_repo.get_project_member(
+            project_id=project_id,
+            user_id=invited_user.id,
+        )
+
+        if existing_user_member:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User is already a member of the project",
+            )
+
+        participant_role = self.role_repo.get_role_by_name("participant")
+
+        project_member = self.project_member_repo.create_project_member(
+            project_id=project_id,
+            user_id=invited_user.id,
+            role_id=participant_role.id,
+        )
+
+        self.db.commit()
+        self.db.refresh(project_member)
+
+        return project_member
