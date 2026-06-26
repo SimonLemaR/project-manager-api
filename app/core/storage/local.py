@@ -2,6 +2,7 @@ from pathlib import Path
 import shutil
 
 from fastapi import UploadFile
+from fastapi.responses import FileResponse
 
 from app.core.storage.base import StorageStrategy
 
@@ -41,3 +42,14 @@ class LocalStorageStrategy(StorageStrategy):
         file_path: str,
     ) -> None:
         Path(file_path).unlink(missing_ok=True)
+
+    def download_file(
+        self,
+        file_path: str,
+        file_name: str,
+    ):
+        return FileResponse(
+            path=file_path,
+            media_type="application/octet-stream",
+            filename=file_name,
+        )

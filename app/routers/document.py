@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, Depends, File, UploadFile, status
 
 from app.core.dependencies import get_current_user, get_document_service
 from app.models.user import User
@@ -15,16 +14,9 @@ async def download_document(
     current_user: User = Depends(get_current_user),
     document_service: DocumentService = Depends(get_document_service),
 ):
-    document = document_service.get_document_by_id(document_id, current_user)
-    if not document:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
-        )
-
-    return FileResponse(
-        path=document.file_path,
-        media_type="application/octet-stream",
-        filename=document.file_name,
+    return document_service.get_document_by_id(
+        document_id=document_id,
+        current_user=current_user,
     )
 
 

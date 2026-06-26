@@ -18,3 +18,11 @@ class StorageStrategy(ABC):
         file_path: str,
     ) -> None:
         raise NotImplementedError
+
+    @abstractmethod
+    def download_file(
+        self,
+        file_path: str,
+        file_name: str,
+    ) -> None:
+        raise NotImplementedError

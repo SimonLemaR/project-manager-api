@@ -1,5 +1,6 @@
 import boto3
 from fastapi import UploadFile
+from fastapi.responses import RedirectResponse
 
 from app.core.config import settings
 from app.core.storage.base import StorageStrategy
@@ -32,3 +33,19 @@ class S3StorageStrategy(StorageStrategy):
             Bucket=self.bucket_name,
             Key=file_path,
         )
+
+    def download_file(
+        self,
+        file_path: str,
+        file_name: str,
+    ):
+        url = self.client.generate_presigned_url(
+            ClientMethod="get_object",
+            Params={
+                "Bucket": self.bucket_name,
+                "Key": file_path,
+            },
+            ExpiresIn=300,
+        )
+
+        return RedirectResponse(url)
