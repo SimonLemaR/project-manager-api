@@ -50,9 +50,8 @@ class DocumentService:
         failed_uploads = []
 
         for file in files:
-            self._validate_file(file)
-
             try:
+                self._validate_file(file)
                 file_path = self.storage_service.save_file(
                     project_id=project_id,
                     file=file,
