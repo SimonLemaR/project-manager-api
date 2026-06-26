@@ -13,7 +13,6 @@ class UserService:
         self.db = db
 
     def create_user(self, user_data: UserRegister) -> User:
-        # validar usuario existente
         existing_user = self.user_repo.get_user_by_email(user_data.email)
         if existing_user:
             raise HTTPException(
@@ -22,7 +21,6 @@ class UserService:
 
         password_hash = hash_password(user_data.password)
 
-        # crear usuario
         new_user = self.user_repo.create_user(user_data, password_hash)
         self.db.commit()
         return new_user
