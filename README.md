@@ -53,6 +53,10 @@ Each layer has a single responsibility:
 
 ---
 
+# Entity Relationship Diagram
+
+![Entity Relationship Diagram](docs/ER_Diagram.png)
+
 # Design Principles
 
 This project applies several software engineering principles and design patterns:
@@ -89,13 +93,13 @@ This project applies several software engineering principles and design patterns
 ```
 app/
 ├── core/
-├── database/
+    ├── database/
+    └── storage/
 ├── models/
 ├── repositories/
 ├── routers/
 ├── schemas/
 ├── services/
-├── storage/
 └── main.py
 
 tests/
@@ -139,7 +143,6 @@ DATABASE_URL=
 SECRET_KEY=
 ALGORITHM=
 ACCESS_TOKEN_EXPIRE_MINUTES=
-
 STORAGE_PROVIDER=local
 ```
 
